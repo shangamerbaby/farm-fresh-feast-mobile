@@ -7,16 +7,16 @@ import ProductCard from '../components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Beef, Chicken, Sheep, Search, ChevronRight } from 'lucide-react';
+import { Beef, Bird, Drumstick, Search, ChevronRight } from 'lucide-react';
 
 const CategoryIcon: React.FC<{ category: string }> = ({ category }) => {
   switch (category) {
     case 'cow':
       return <Beef className="h-6 w-6" />;
     case 'chicken':
-      return <Chicken className="h-6 w-6" />;
+      return <Drumstick className="h-6 w-6" />;
     case 'mutton':
-      return <Sheep className="h-6 w-6" />;
+      return <Bird className="h-6 w-6" />;
     default:
       return <Beef className="h-6 w-6" />;
   }
