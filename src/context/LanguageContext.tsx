@@ -1,8 +1,7 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // Supported languages
-export type LanguageType = 'en' | 'ml' | 'ta' | 'fr' | 'zh';
+export type LanguageType = 'en' | 'ml' | 'ta' | 'fr' | 'zh' | 'ms';
 
 // Added currency symbols for each language
 export const currencySymbols = {
@@ -10,7 +9,8 @@ export const currencySymbols = {
   ml: '₹',
   ta: '₹',
   fr: '€',
-  zh: '¥'
+  zh: '¥',
+  ms: 'RM'
 };
 
 // Translation interface
@@ -84,7 +84,14 @@ const translations: Translations = {
     backToHome: 'Back to Home',
     pending: 'Pending',
     processing: 'Processing',
-    delivered: 'Delivered'
+    delivered: 'Delivered',
+    login: 'Login',
+    email: 'Email',
+    password: 'Password',
+    forgotPassword: 'Forgot Password?',
+    signIn: 'Sign In',
+    dontHaveAccount: 'Don\'t have an account?',
+    signUp: 'Sign Up'
   },
   ml: {
     appName: 'ഫാം ഫ്രെഷ് ഫീസ്റ്റ്',
@@ -148,7 +155,14 @@ const translations: Translations = {
     backToHome: 'ഹോമിലേക്ക് മടങ്ങുക',
     pending: 'തീർച്ചപ്പെടുത്താത്ത',
     processing: 'പ്രോസസ്സിംഗ്',
-    delivered: 'വിതരണം ചെയ്തു'
+    delivered: 'വിതരണം ചെയ്തു',
+    login: 'ലോഗിൻ',
+    email: 'ഇമെയിൽ',
+    password: 'പാസ്‌വേഡ്',
+    forgotPassword: 'പാസ്‌വേഡ് മറന്നോ?',
+    signIn: 'സൈൻ ഇൻ',
+    dontHaveAccount: 'അക്കൗണ്ട് ഇല്ലേ?',
+    signUp: 'സൈൻ അപ്പ്'
   },
   ta: {
     appName: 'பண்ணை புதிய விருந்து',
@@ -190,7 +204,14 @@ const translations: Translations = {
     freshCuts: 'Coupes fraîches',
     premiumSelection: 'Sélection Premium',
     bestSellers: 'Meilleures ventes',
-    viewAll: 'Voir tout'
+    viewAll: 'Voir tout',
+    login: 'Connexion',
+    email: 'E-mail',
+    password: 'Mot de passe',
+    forgotPassword: 'Mot de passe oublié?',
+    signIn: 'Se connecter',
+    dontHaveAccount: 'Vous n\'avez pas de compte?',
+    signUp: 'S\'inscrire'
   },
   zh: {
     appName: '农场新鲜盛宴',
@@ -211,7 +232,85 @@ const translations: Translations = {
     freshCuts: '新鲜切块',
     premiumSelection: '优质选择',
     bestSellers: '畅销产品',
-    viewAll: '查看全部'
+    viewAll: '查看全部',
+    login: '登录',
+    email: '电子邮件',
+    password: '密码',
+    forgotPassword: '忘记密码？',
+    signIn: '登录',
+    dontHaveAccount: '没有账户？',
+    signUp: '注册'
+  },
+  ms: {
+    appName: 'Pesta Segar Ladang',
+    tagline: 'Penghantaran Daging dari Ladang ke Meja',
+    home: 'Utama',
+    categories: 'Kategori',
+    orders: 'Pesanan',
+    account: 'Akaun',
+    cow: 'Daging Lembu',
+    chicken: 'Ayam',
+    mutton: 'Daging Kambing',
+    search: 'Cari produk...',
+    addToCart: 'Tambah ke Troli',
+    viewDetails: 'Lihat Butiran',
+    checkout: 'Bayar',
+    language: 'Bahasa',
+    settings: 'Tetapan',
+    freshCuts: 'Potongan Segar',
+    premiumSelection: 'Pilihan Premium',
+    bestSellers: 'Terlaris',
+    viewAll: 'Lihat Semua',
+    login: 'Log Masuk',
+    email: 'E-mel',
+    password: 'Kata Laluan',
+    forgotPassword: 'Lupa Kata Laluan?',
+    signIn: 'Log Masuk',
+    dontHaveAccount: 'Tiada akaun?',
+    signUp: 'Daftar',
+    // Admin translations
+    adminDashboard: 'Papan Pemuka Admin',
+    manageProducts: 'Produk',
+    activeOrders: 'Pesanan Aktif',
+    orderLogs: 'Log Pesanan',
+    productsList: 'Senarai Produk',
+    addProduct: 'Tambah Produk',
+    editProduct: 'Edit Produk',
+    productName: 'Nama Produk',
+    category: 'Kategori',
+    allCategories: 'Semua Kategori',
+    selectCategory: 'Pilih Kategori',
+    price: 'Harga',
+    imageUrl: 'URL Imej',
+    description: 'Penerangan',
+    actions: 'Tindakan',
+    updateProduct: 'Kemas Kini Produk',
+    productAdded: 'Produk berjaya ditambah',
+    productUpdated: 'Produk berjaya dikemas kini',
+    productDeleted: 'Produk berjaya dipadam',
+    cancel: 'Batal',
+    name: 'Nama',
+    cut: 'Potong',
+    orderId: 'ID Pesanan',
+    customer: 'Pelanggan',
+    orderDate: 'Tarikh Pesanan',
+    completedDate: 'Tarikh Siap',
+    items: 'Item',
+    total: 'Jumlah',
+    viewItems: 'Lihat Item',
+    packingList: 'Senarai Pembungkusan',
+    customerName: 'Nama Pelanggan',
+    packed: 'Dibungkus',
+    completeOrder: 'Siapkan Pesanan',
+    complete: 'Siap',
+    noActiveOrders: 'Tiada Pesanan Aktif',
+    allOrdersCompleted: 'Semua pesanan telah siap',
+    completedOrders: 'Pesanan Siap',
+    adminAccessDenied: 'Akses admin ditolak',
+    backToHome: 'Kembali ke Utama',
+    pending: 'Tertunda',
+    processing: 'Sedang Diproses',
+    delivered: 'Dihantar'
   }
 };
 
@@ -236,6 +335,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     { code: 'ta' as LanguageType, name: 'தமிழ்' },
     { code: 'fr' as LanguageType, name: 'Français' },
     { code: 'zh' as LanguageType, name: '中文' },
+    { code: 'ms' as LanguageType, name: 'Bahasa Melayu' },
   ];
 
   // Translation function

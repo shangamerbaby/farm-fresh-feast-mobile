@@ -13,6 +13,7 @@ import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import Account from "./pages/Account";
 import Admin from "./pages/Admin";
+import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/login" element={<Login />} />
               <Route path="/" element={<Layout />}>
                 <Route index element={<Index />} />
                 <Route path="categories" element={<Categories />} />
