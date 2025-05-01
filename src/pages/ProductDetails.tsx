@@ -11,10 +11,11 @@ import { useState } from 'react';
 
 const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { t } = useLanguage();
+  const { t, getCurrencySymbol } = useLanguage();
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const currencySymbol = getCurrencySymbol();
 
   const product = getProductById(id || '');
   
@@ -73,7 +74,7 @@ const ProductDetails: React.FC = () => {
           {product.cut && `${product.cut} • `}{t(product.category)}
         </p>
         <p className="text-primary text-2xl font-semibold mb-4">
-          ${product.price.toFixed(2)}
+          {currencySymbol}{product.price.toFixed(2)}
         </p>
         <p className="text-muted-foreground mb-6">{product.description}</p>
 

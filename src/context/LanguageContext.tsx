@@ -4,6 +4,15 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 // Supported languages
 export type LanguageType = 'en' | 'ml' | 'ta' | 'fr' | 'zh';
 
+// Added currency symbols for each language
+export const currencySymbols = {
+  en: '$',
+  ml: '₹',
+  ta: '₹',
+  fr: '€',
+  zh: '¥'
+};
+
 // Translation interface
 interface Translations {
   [key: string]: {
@@ -32,7 +41,50 @@ const translations: Translations = {
     freshCuts: 'Fresh Cuts',
     premiumSelection: 'Premium Selection',
     bestSellers: 'Best Sellers',
-    viewAll: 'View All'
+    viewAll: 'View All',
+    // Admin translations
+    adminDashboard: 'Admin Dashboard',
+    manageProducts: 'Products',
+    activeOrders: 'Active Orders',
+    orderLogs: 'Order Logs',
+    productsList: 'Products List',
+    addProduct: 'Add Product',
+    editProduct: 'Edit Product',
+    productName: 'Product Name',
+    category: 'Category',
+    allCategories: 'All Categories',
+    selectCategory: 'Select Category',
+    price: 'Price',
+    imageUrl: 'Image URL',
+    description: 'Description',
+    actions: 'Actions',
+    updateProduct: 'Update Product',
+    productAdded: 'Product added successfully',
+    productUpdated: 'Product updated successfully',
+    productDeleted: 'Product deleted successfully',
+    cancel: 'Cancel',
+    name: 'Name',
+    cut: 'Cut',
+    orderId: 'Order ID',
+    customer: 'Customer',
+    orderDate: 'Order Date',
+    completedDate: 'Completed Date',
+    items: 'Items',
+    total: 'Total',
+    viewItems: 'View Items',
+    packingList: 'Packing List',
+    customerName: 'Customer Name',
+    packed: 'Packed',
+    completeOrder: 'Complete Order',
+    complete: 'Complete',
+    noActiveOrders: 'No Active Orders',
+    allOrdersCompleted: 'All orders have been completed',
+    completedOrders: 'Completed Orders',
+    adminAccessDenied: 'Admin access denied',
+    backToHome: 'Back to Home',
+    pending: 'Pending',
+    processing: 'Processing',
+    delivered: 'Delivered'
   },
   ml: {
     appName: 'ഫാം ഫ്രെഷ് ഫീസ്റ്റ്',
@@ -53,7 +105,50 @@ const translations: Translations = {
     freshCuts: 'പുതിയ കട്ടുകൾ',
     premiumSelection: 'പ്രീമിയം തിരഞ്ഞെടുപ്പ്',
     bestSellers: 'ഏറ്റവും വിൽപ്പന',
-    viewAll: 'എല്ലാം കാണുക'
+    viewAll: 'എല്ലാം കാണുക',
+    // Admin translations
+    adminDashboard: 'അഡ്മിൻ ഡാഷ്ബോർഡ്',
+    manageProducts: 'ഉൽപ്പന്നങ്ങൾ',
+    activeOrders: 'സജീവ ഓർഡറുകൾ',
+    orderLogs: 'ഓർഡർ ലോഗുകൾ',
+    productsList: 'ഉൽപ്പന്നങ്ങളുടെ പട്ടിക',
+    addProduct: 'ഉൽപ്പന്നം ചേർക്കുക',
+    editProduct: 'ഉൽപ്പന്നം എഡിറ്റ് ചെയ്യുക',
+    productName: 'ഉൽപ്പന്നത്തിന്റെ പേര്',
+    category: 'വിഭാഗം',
+    allCategories: 'എല്ലാ വിഭാഗങ്ങളും',
+    selectCategory: 'വിഭാഗം തിരഞ്ഞെടുക്കുക',
+    price: 'വില',
+    imageUrl: 'ചിത്രം URL',
+    description: 'വിവരണം',
+    actions: 'പ്രവർത്തനങ്ങൾ',
+    updateProduct: 'ഉൽപ്പന്നം പുതുക്കുക',
+    productAdded: 'ഉൽപ്പന്നം വിജയകരമായി ചേർത്തു',
+    productUpdated: 'ഉൽപ്പന്നം വിജയകരമായി പുതുക്കി',
+    productDeleted: 'ഉൽപ്പന്നം വിജയകരമായി നീക്കം ചെയ്തു',
+    cancel: 'റദ്ദാക്കുക',
+    name: 'പേര്',
+    cut: 'മുറിയുക',
+    orderId: 'ഓർഡർ ഐഡി',
+    customer: 'ഉപഭോക്താവ്',
+    orderDate: 'ഓർഡർ തീയതി',
+    completedDate: 'പൂർത്തീകരിച്ച തീയതി',
+    items: 'ഇനങ്ങൾ',
+    total: 'ആകെ',
+    viewItems: 'ഇനങ്ങൾ കാണുക',
+    packingList: 'പാക്കിംഗ് ലിസ്റ്റ്',
+    customerName: 'ഉപഭോക്താവിന്റെ പേര്',
+    packed: 'പാക്ക് ചെയ്തു',
+    completeOrder: 'ഓർഡർ പൂർത്തിയാക്കുക',
+    complete: 'പൂർത്തിയാക്കുക',
+    noActiveOrders: 'സജീവ ഓർഡറുകൾ ഇല്ല',
+    allOrdersCompleted: 'എല്ലാ ഓർഡറുകളും പൂർത്തിയാക്കി',
+    completedOrders: 'പൂർത്തിയാക്കിയ ഓർഡറുകൾ',
+    adminAccessDenied: 'അഡ്മിൻ ആക്സസ് നിഷേധിച്ചു',
+    backToHome: 'ഹോമിലേക്ക് മടങ്ങുക',
+    pending: 'തീർച്ചപ്പെടുത്താത്ത',
+    processing: 'പ്രോസസ്സിംഗ്',
+    delivered: 'വിതരണം ചെയ്തു'
   },
   ta: {
     appName: 'பண்ணை புதிய விருந்து',
@@ -125,6 +220,7 @@ interface LanguageContextType {
   language: LanguageType;
   setLanguage: (language: LanguageType) => void;
   t: (key: string) => string;
+  getCurrencySymbol: () => string;
   availableLanguages: { code: LanguageType; name: string }[];
 }
 
@@ -148,9 +244,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
     return translations[language][key] || translations.en[key] || key;
   };
+  
+  // Get currency symbol based on current language
+  const getCurrencySymbol = (): string => {
+    return currencySymbols[language] || '$';
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, availableLanguages }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, getCurrencySymbol, availableLanguages }}>
       {children}
     </LanguageContext.Provider>
   );

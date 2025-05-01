@@ -53,22 +53,19 @@ const OrderStatusIcon: React.FC<{ status: string }> = ({ status }) => {
 };
 
 const OrderStatusText: React.FC<{ status: string }> = ({ status }) => {
-  switch (status) {
-    case 'pending':
-      return <span className="text-yellow-500">Pending</span>;
-    case 'processing':
-      return <span className="text-blue-500">Processing</span>;
-    case 'delivered':
-      return <span className="text-green-500">Delivered</span>;
-    default:
-      return <span className="text-gray-500">Unknown</span>;
-  }
+  const { t } = useLanguage();
+  return <span className={`
+    ${status === 'pending' ? 'text-yellow-500' : ''}
+    ${status === 'processing' ? 'text-blue-500' : ''}
+    ${status === 'delivered' ? 'text-green-500' : ''}
+  `}>{t(status)}</span>;
 };
 
 const Orders: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, getCurrencySymbol } = useLanguage();
   const navigate = useNavigate();
   const orders = sampleOrders;
+  const currencySymbol = getCurrencySymbol();
 
   return (
     <div className="container px-4 pt-4 pb-20">
@@ -112,7 +109,7 @@ const Orders: React.FC = () => {
                 </div>
                 
                 <div className="mt-3">
-                  <p className="text-sm font-medium">Items:</p>
+                  <p className="text-sm font-medium">{t('items')}:</p>
                   <ul className="text-sm text-muted-foreground">
                     {order.items.map((item, index) => (
                       <li key={index}>{item}</li>
@@ -122,8 +119,8 @@ const Orders: React.FC = () => {
               </CardContent>
               
               <CardFooter className="bg-muted p-4 flex justify-between">
-                <span className="text-sm font-medium">Total</span>
-                <span className="font-semibold">${order.total.toFixed(2)}</span>
+                <span className="text-sm font-medium">{t('total')}</span>
+                <span className="font-semibold">{currencySymbol}{order.total.toFixed(2)}</span>
               </CardFooter>
             </Card>
           ))}

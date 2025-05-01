@@ -1,56 +1,75 @@
 
 import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { 
-  User, Settings, Globe, CreditCard, 
-  MapPin, Bell, HelpCircle, LogOut 
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  User,
+  Settings,
+  ShoppingBag,
+  Languages,
+  ArrowLeft,
+  LogOut,
+  Shield,
 } from 'lucide-react';
-import { toast } from "@/components/ui/sonner";
 
 const Account: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
-  
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as any);
-    toast(`Language changed to ${e.target.options[e.target.selectedIndex].text}`);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="container px-4 pt-4 pb-20">
-      {/* Header */}
-      <div className="mb-6 text-center">
-        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-          <User className="h-10 w-10 text-muted-foreground" />
-        </div>
-        <h1 className="text-xl font-bold">Restaurant User</h1>
-        <p className="text-muted-foreground">restaurant@example.com</p>
+      {/* Header with back button */}
+      <div className="flex items-center mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-xl font-bold ml-2">{t('account')}</h1>
       </div>
 
-      {/* Account sections */}
-      <div className="space-y-6">
-        {/* Settings section */}
-        <Card>
-          <CardContent className="p-0">
-            <div className="p-4">
-              <h2 className="font-semibold flex items-center">
-                <Settings className="h-4 w-4 mr-2" />
-                {t('settings')}
-              </h2>
+      {/* User info section */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="h-8 w-8 text-primary" />
             </div>
-            <Separator />
+            <div>
+              <CardTitle>Guest User</CardTitle>
+              <CardDescription>guest@example.com</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Account options */}
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-lg">{t('settings')}</CardTitle>
+          </CardHeader>
+          <CardContent className="py-0 space-y-0 divide-y">
+            <Link to="/orders" className="flex items-center py-3">
+              <ShoppingBag className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('orders')}</span>
+            </Link>
             
-            {/* Language setting */}
-            <div className="p-4 flex justify-between items-center">
+            <div className="flex items-center justify-between py-3">
               <div className="flex items-center">
-                <Globe className="h-4 w-4 mr-2 text-muted-foreground" />
+                <Languages className="h-5 w-5 mr-3 text-primary" />
                 <span>{t('language')}</span>
               </div>
               <select
                 value={language}
-                onChange={handleLanguageChange}
+                onChange={(e) => setLanguage(e.target.value as any)}
                 className="text-sm border rounded-md p-1"
               >
                 {availableLanguages.map((lang) => (
@@ -60,81 +79,22 @@ const Account: React.FC = () => {
                 ))}
               </select>
             </div>
-            <Separator />
-            
-            {/* Payment Methods */}
-            <div className="p-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <CreditCard className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>Payment Methods</span>
-              </div>
-              <Button variant="ghost" size="sm">
-                Manage
-              </Button>
-            </div>
-            <Separator />
-            
-            {/* Address */}
-            <div className="p-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>Delivery Address</span>
-              </div>
-              <Button variant="ghost" size="sm">
-                Edit
-              </Button>
-            </div>
-            <Separator />
-            
-            {/* Notifications */}
-            <div className="p-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <Bell className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span>Notifications</span>
-              </div>
-              <Button variant="ghost" size="sm">
-                Manage
-              </Button>
-            </div>
+
+            <Link to="/admin" className="flex items-center py-3">
+              <Shield className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('adminDashboard')}</span>
+            </Link>
           </CardContent>
         </Card>
 
-        {/* Support section */}
         <Card>
-          <CardContent className="p-0">
-            <div className="p-4">
-              <h2 className="font-semibold flex items-center">
-                <HelpCircle className="h-4 w-4 mr-2" />
-                Support
-              </h2>
-            </div>
-            <Separator />
-            
-            <Button variant="ghost" className="w-full justify-start p-4 rounded-none">
-              Contact Us
+          <CardFooter className="justify-center py-4">
+            <Button variant="outline" className="w-full">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
             </Button>
-            <Separator />
-            
-            <Button variant="ghost" className="w-full justify-start p-4 rounded-none">
-              FAQs
-            </Button>
-            <Separator />
-            
-            <Button variant="ghost" className="w-full justify-start p-4 rounded-none">
-              Privacy Policy
-            </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
-
-        {/* Logout button */}
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={() => toast("This would log you out in a real app")}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Logout
-        </Button>
       </div>
     </div>
   );
