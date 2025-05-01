@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Globe, Lock, User } from 'lucide-react';
+import { toast } from 'sonner';
+
+// Sample users for demonstration - in a real app, these would be in a database
+const USERS = [
+  { email: 'admin@example.com', password: 'admin123', role: 'admin' },
+  { email: 'customer@example.com', password: 'customer123', role: 'customer' }
+];
 
 const Login: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
@@ -16,9 +23,29 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would normally handle authentication
-    // For demo purposes, we'll redirect to home
-    navigate('/');
+    
+    // Simulate authentication
+    const user = USERS.find(user => user.email === email && user.password === password);
+    
+    if (user) {
+      // Store user info in localStorage (in a real app, use a proper auth system)
+      localStorage.setItem('currentUser', JSON.stringify({
+        email: user.email,
+        role: user.role,
+        isAuthenticated: true
+      }));
+      
+      toast.success(t('loginSuccess'));
+      
+      // Redirect based on role
+      if (user.role === 'admin') {
+        navigate('/app/admin');
+      } else {
+        navigate('/app');
+      }
+    } else {
+      toast.error(t('invalidCredentials'));
+    }
   };
 
   return (
@@ -94,12 +121,13 @@ const Login: React.FC = () => {
           </CardContent>
           
           <CardFooter className="flex justify-center">
-            <p className="text-sm text-muted-foreground">
-              {t('dontHaveAccount')} 
-              <Link to="/signup" className="ml-1 text-primary hover:underline">
-                {t('signUp')}
-              </Link>
-            </p>
+            <div className="text-sm text-muted-foreground">
+              {t('demoCredentialsHeading')}:
+              <ul className="mt-2 list-disc pl-5">
+                <li>Admin: admin@example.com / admin123</li>
+                <li>Customer: customer@example.com / customer123</li>
+              </ul>
+            </div>
           </CardFooter>
         </Card>
       </div>
