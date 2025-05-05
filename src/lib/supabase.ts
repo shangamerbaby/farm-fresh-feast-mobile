@@ -1,11 +1,15 @@
+
 import { createClient } from '@supabase/supabase-js';
 
-// Replace these with your actual Supabase URL and anon key
-// These are placeholders and need to be replaced with your actual Supabase credentials
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co',
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
-);
+const supabaseUrl = "https://janvznwulosbrsknishq.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphbnZ6bnd1bG9zYnJza25pc2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMTE4ODksImV4cCI6MjA2MTY4Nzg4OX0.Jxv9RZ9MZsxMcbjL2RtFenATdv1_J_8dyBl-ZGO68sA";
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  }
+});
 
 // User related functions
 export async function signIn(email: string, password: string) {
@@ -21,19 +25,11 @@ export async function signOut() {
   return { error };
 }
 
-// Database functions - Users
-export async function getUsers() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*');
-  return { data, error };
-}
-
-export async function createUser(userData: { email: string, password: string, role: string }) {
+export async function createUser({ email, password, role }: { email: string, password: string, role: 'admin' | 'customer' }) {
   // First create auth user
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email: userData.email,
-    password: userData.password,
+    email,
+    password,
     email_confirm: true,
   });
 
@@ -44,13 +40,20 @@ export async function createUser(userData: { email: string, password: string, ro
     .from('users')
     .insert({
       id: authData.user?.id,
-      email: userData.email,
-      role: userData.role,
-      created_at: new Date().toISOString(),
+      email,
+      role,
     })
     .select()
     .single();
 
+  return { data, error };
+}
+
+// Database functions - Users
+export async function getUsers() {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*');
   return { data, error };
 }
 
@@ -67,6 +70,15 @@ export async function getProductsByCategory(category: string) {
     .from('products')
     .select('*')
     .eq('category', category);
+  return { data, error };
+}
+
+export async function getProductById(id: string) {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', id)
+    .single();
   return { data, error };
 }
 
@@ -91,7 +103,6 @@ export async function createOrder(orderData: {
       user_id: orderData.userId,
       total: orderData.total,
       status: 'pending',
-      created_at: new Date().toISOString(),
     })
     .select()
     .single();

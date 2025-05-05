@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -12,30 +13,11 @@ import UserManager from '../components/admin/UserManager';
 
 const Admin: React.FC = () => {
   const { t } = useLanguage();
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("products");
-  const [isAdmin, setIsAdmin] = useState(false);
   
-  useEffect(() => {
-    // Check if user is an admin
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      const user = JSON.parse(userData);
-      if (user.role === 'admin') {
-        setIsAdmin(true);
-      } else {
-        // Redirect non-admin users
-        navigate('/app');
-      }
-    } else {
-      // Redirect to login if no user data
-      navigate('/login');
-    }
-  }, [navigate]);
-
-  if (!isAdmin) {
-    return null; // Will redirect in useEffect
-  }
+  // No need to check isAdmin here as the ProtectedRoute with requireAdmin will handle it
 
   return (
     <div className="container px-4 pt-4 pb-20">

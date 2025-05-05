@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Globe, Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
 
 const Login: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
@@ -25,6 +26,76 @@ const Login: React.FC = () => {
       navigate(isAdmin ? '/app/admin' : '/app');
     }
   }, [user, isAdmin, navigate]);
+
+  // Create test accounts on first load (only in development)
+  useEffect(() => {
+    const createTestAccounts = async () => {
+      try {
+        // Check if admin account exists
+        const { data: existingUsers } = await supabase
+          .from('users')
+          .select('email')
+          .in('email', ['admin@example.com', 'customer@example.com']);
+        
+        if (existingUsers && existingUsers.length >= 2) {
+          console.log('Test accounts already exist');
+          return;
+        }
+
+        // Create admin test account
+        const { error: adminError } = await supabase.auth.admin.createUser({
+          email: 'admin@example.com',
+          password: 'admin123',
+          email_confirm: true,
+        });
+
+        if (!adminError) {
+          // Get the user ID from auth
+          const { data: adminUser } = await supabase.auth.admin.getUserById(
+            (await supabase.auth.admin.listUsers()).data.users.find(u => u.email === 'admin@example.com')?.id || ''
+          );
+
+          if (adminUser?.user) {
+            // Add to users table
+            await supabase.from('users').insert({
+              id: adminUser.user.id,
+              email: 'admin@example.com',
+              role: 'admin',
+            });
+            console.log('Admin account created');
+          }
+        }
+
+        // Create customer test account
+        const { error: customerError } = await supabase.auth.admin.createUser({
+          email: 'customer@example.com',
+          password: 'customer123',
+          email_confirm: true,
+        });
+
+        if (!customerError) {
+          // Get the user ID from auth
+          const { data: customerUser } = await supabase.auth.admin.getUserById(
+            (await supabase.auth.admin.listUsers()).data.users.find(u => u.email === 'customer@example.com')?.id || ''
+          );
+
+          if (customerUser?.user) {
+            // Add to users table
+            await supabase.from('users').insert({
+              id: customerUser.user.id,
+              email: 'customer@example.com',
+              role: 'customer',
+            });
+            console.log('Customer account created');
+          }
+        }
+      } catch (error) {
+        console.error('Error creating test accounts:', error);
+      }
+    };
+
+    createTestAccounts();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
