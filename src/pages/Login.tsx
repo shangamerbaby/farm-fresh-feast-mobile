@@ -16,6 +16,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setConnectionError(false);
     
     try {
       const { success, error } = await signIn(email, password);
@@ -35,13 +37,22 @@ const Login: React.FC = () => {
       if (success) {
         toast.success(t('loginSuccess'));
         // Navigation will happen in the useEffect
-      } else {
+      } else if (error) {
         console.error('Login error:', error);
-        toast.error(error?.message || t('invalidCredentials'));
+        
+        // Check if it's a connection error
+        if (error.message === 'Failed to fetch' || error.status === 0) {
+          setConnectionError(true);
+          toast.error(t('connectionError') || 'Connection error. Please check your Supabase configuration.');
+        } else {
+          // Regular auth error
+          toast.error(error?.message || t('invalidCredentials'));
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(t('connectionError') || 'Connection error. Please check your internet connection or try again later.');
+      setConnectionError(true);
+      toast.error(t('connectionError') || 'Connection error. Please check your internet connection or Supabase configuration.');
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +85,15 @@ const Login: React.FC = () => {
           </CardHeader>
           
           <CardContent>
+            {connectionError && (
+              <div className="mb-4 p-3 bg-red-50 text-red-800 rounded-md border border-red-200">
+                <p className="font-medium">Connection Error</p>
+                <p className="text-sm">
+                  Unable to connect to Supabase. Please check your Supabase configuration or internet connection.
+                </p>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>

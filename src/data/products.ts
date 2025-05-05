@@ -31,10 +31,10 @@ export const getCuts = (): string[] => {
 
 // Get featured products
 export const getFeaturedProducts = (count: number = 4): Product[] => {
-  return products.slice(0, Math.min(count, products.length));
+  return [];
 };
 
 // Get best selling products
 export const getBestSellingProducts = (count: number = 4): Product[] => {
-  return products.slice(0, Math.min(count, products.length));
+  return [];
 };

@@ -1,11 +1,11 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-// Replace with your Supabase URL and anon key
-const supabaseUrl = 'https://your-project-url.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Replace these with your actual Supabase URL and anon key
+// These are placeholders and need to be replaced with your actual Supabase credentials
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co',
+  import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
+);
 
 // User related functions
 export async function signIn(email: string, password: string) {
@@ -82,7 +82,7 @@ export async function getOrders(userId: string) {
 export async function createOrder(orderData: {
   userId: string,
   total: number,
-  items: Array<{ productId: string, quantity: number, price: number }>
+  items: Array<{ productId: string; quantity: number; price: number }>
 }) {
   // First create the order
   const { data: createdOrder, error: orderError } = await supabase
