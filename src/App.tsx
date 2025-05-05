@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
 import { CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Categories from "./pages/Categories";
 import ProductDetails from "./pages/ProductDetails";
@@ -24,33 +26,42 @@ const queryClient = new QueryClient();
 const App: React.FC = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <CartProvider>
-          <TooltipProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/app" element={<Layout />}>
-                  <Route index element={<Index />} />
-                  <Route path="categories" element={<Categories />} />
-                  <Route path="product/:id" element={<ProductDetails />} />
-                  <Route path="cart" element={<Cart />} />
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="account" element={<Account />} />
-                  <Route path="admin" element={<Admin />} />
+      <AuthProvider>
+        <LanguageProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route 
+                    path="/app" 
+                    element={
+                      <ProtectedRoute>
+                        <Layout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<Index />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="product/:id" element={<ProductDetails />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="account" element={<Account />} />
+                    <Route path="admin" element={<Admin />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+                  {/* Redirect root path to login */}
+                  <Route path="/" element={<Navigate to="/login" replace />} />
                   <Route path="*" element={<NotFound />} />
-                </Route>
-                {/* Redirect root path to login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </CartProvider>
-      </LanguageProvider>
+                </Routes>
+              </BrowserRouter>
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </CartProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

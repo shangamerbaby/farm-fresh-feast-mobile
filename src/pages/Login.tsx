@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,42 +10,38 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Globe, Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Sample users for demonstration - in a real app, these would be in a database
-const USERS = [
-  { email: 'admin@example.com', password: 'admin123', role: 'admin' },
-  { email: 'customer@example.com', password: 'customer123', role: 'customer' }
-];
-
 const Login: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
+  const { signIn, user, isAdmin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simulate authentication
-    const user = USERS.find(user => user.email === email && user.password === password);
-    
+  useEffect(() => {
+    // If already logged in, redirect
     if (user) {
-      // Store user info in localStorage (in a real app, use a proper auth system)
-      localStorage.setItem('currentUser', JSON.stringify({
-        email: user.email,
-        role: user.role,
-        isAuthenticated: true
-      }));
+      navigate(isAdmin ? '/app/admin' : '/app');
+    }
+  }, [user, isAdmin, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const { success, error } = await signIn(email, password);
       
-      toast.success(t('loginSuccess'));
-      
-      // Redirect based on role
-      if (user.role === 'admin') {
-        navigate('/app/admin');
+      if (success) {
+        toast.success(t('loginSuccess'));
+        // Navigation will happen in the useEffect
       } else {
-        navigate('/app');
+        toast.error(error.message || t('invalidCredentials'));
       }
-    } else {
-      toast.error(t('invalidCredentials'));
+    } catch (error) {
+      toast.error(t('loginError'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -116,7 +113,9 @@ const Login: React.FC = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full">{t('signIn')}</Button>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? t('signingIn') : t('signIn')}
+              </Button>
             </form>
           </CardContent>
           

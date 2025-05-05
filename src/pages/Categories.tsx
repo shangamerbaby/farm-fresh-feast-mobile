@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { getCategories, getProductsByCategory, products } from '../data/products';
 import ProductCard from '../components/ProductCard';
@@ -8,12 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const Categories: React.FC = () => {
   const { t } = useLanguage();
   const categories = getCategories();
   const location = useLocation();
+  const navigate = useNavigate();
   const preSelectedCategory = location.state?.selectedCategory || categories[0];
   
   const [selectedCategory, setSelectedCategory] = useState<string>(preSelectedCategory);
@@ -37,11 +37,9 @@ const Categories: React.FC = () => {
     <div className="container px-4 pt-4 pb-20">
       {/* Header */}
       <div className="flex items-center mb-4">
-        <Link to="/" className="mr-2">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/app')}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <h1 className="text-xl font-bold">{t('categories')}</h1>
       </div>
 

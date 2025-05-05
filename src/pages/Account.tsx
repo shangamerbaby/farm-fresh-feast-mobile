@@ -1,40 +1,26 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, LogOut, User, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface UserData {
-  email: string;
-  role: string;
-  isAuthenticated: boolean;
-}
-
 const Account: React.FC = () => {
   const { t } = useLanguage();
+  const { user, userData, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<UserData | null>(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
-    } else {
-      navigate('/login');
-    }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
+  const handleLogout = async () => {
+    await signOut();
     toast.success(t('logoutSuccess'));
     navigate('/login');
   };
 
-  if (!userData) {
-    return null; // Will redirect in useEffect
+  if (!user) {
+    return null;
   }
 
   return (
@@ -56,14 +42,14 @@ const Account: React.FC = () => {
               <User className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <p className="font-medium">{userData.email}</p>
-              <p className="text-sm text-muted-foreground capitalize">{userData.role}</p>
+              <p className="font-medium">{user.email}</p>
+              <p className="text-sm text-muted-foreground capitalize">{userData?.role || 'user'}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {userData.role === 'admin' && (
+      {isAdmin && (
         <Button 
           variant="outline" 
           className="w-full mb-4 justify-start"
