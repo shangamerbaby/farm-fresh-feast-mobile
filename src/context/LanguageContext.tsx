@@ -3,13 +3,13 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 // Supported languages
 export type LanguageType = 'en' | 'ml' | 'ta' | 'fr' | 'zh' | 'ms';
 
-// Added currency symbols for each language
+// Set all currencies to RM (Malaysian Ringgit)
 export const currencySymbols = {
-  en: '$',
-  ml: '₹',
-  ta: '₹',
-  fr: '€',
-  zh: '¥',
+  en: 'RM',
+  ml: 'RM',
+  ta: 'RM',
+  fr: 'RM',
+  zh: 'RM',
   ms: 'RM'
 };
 
@@ -42,6 +42,12 @@ const translations: Translations = {
     premiumSelection: 'Premium Selection',
     bestSellers: 'Best Sellers',
     viewAll: 'View All',
+    loginSuccess: 'Login successful',
+    invalidCredentials: 'Invalid credentials',
+    connectionError: 'Connection error. Please check your internet connection.',
+    loginError: 'Login failed. Please try again.',
+    demoCredentialsHeading: 'Demo credentials',
+    signingIn: 'Signing in...',
     // Admin translations
     adminDashboard: 'Admin Dashboard',
     manageProducts: 'Products',
@@ -91,7 +97,8 @@ const translations: Translations = {
     forgotPassword: 'Forgot Password?',
     signIn: 'Sign In',
     dontHaveAccount: 'Don\'t have an account?',
-    signUp: 'Sign Up'
+    signUp: 'Sign Up',
+    logoutSuccess: 'Logged out successfully'
   },
   ml: {
     appName: 'ഫാം ഫ്രെഷ് ഫീസ്റ്റ്',
@@ -162,7 +169,11 @@ const translations: Translations = {
     forgotPassword: 'പാസ്‌വേഡ് മറന്നോ?',
     signIn: 'സൈൻ ഇൻ',
     dontHaveAccount: 'അക്കൗണ്ട് ഇല്ലേ?',
-    signUp: 'സൈൻ അപ്പ്'
+    signUp: 'സൈൻ അപ്പ്',
+    connectionError: 'കണക്ഷൻ പിശക്. ദയവായി നിങ്ങളുടെ ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.',
+    loginError: 'ലോഗിൻ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.',
+    signingIn: 'സൈൻ ഇൻ ചെയ്യുന്നു...',
+    logoutSuccess: 'ലോഗ് ഔട്ട് വിജയിച്ചു'
   },
   ta: {
     appName: 'பண்ணை புதிய விருந்து',
@@ -183,7 +194,18 @@ const translations: Translations = {
     freshCuts: 'புதிய வெட்டுகள்',
     premiumSelection: 'பிரீமியம் தேர்வு',
     bestSellers: 'சிறந்த விற்பனையாளர்கள்',
-    viewAll: 'அனைத்தையும் காட்டு'
+    viewAll: 'அனைத்தையும் காட்டு',
+    login: 'உள்நுழை',
+    email: 'மின்னஞ்சல்',
+    password: 'கடவுச்சொல்',
+    forgotPassword: 'கடவுச்சொல்லை மறந்து விட்டீர்களா?',
+    signIn: 'உள்நுழைய',
+    dontHaveAccount: 'கணக்கு இல்லையா?',
+    signUp: 'பதிவு செய்',
+    connectionError: 'இணைப்பு பிழை. உங்கள் இணைய இணைப்பை சரிபார்க்கவும்.',
+    loginError: 'உள்நுழைவு தோல்வி. மீண்டும் முயற்சிக்கவும்.',
+    signingIn: 'உள்நுழைகிறது...',
+    logoutSuccess: 'வெற்றிகரமாக வெளியேறப்பட்டது'
   },
   fr: {
     appName: 'Festin Fermier Frais',
@@ -211,7 +233,11 @@ const translations: Translations = {
     forgotPassword: 'Mot de passe oublié?',
     signIn: 'Se connecter',
     dontHaveAccount: 'Vous n\'avez pas de compte?',
-    signUp: 'S\'inscrire'
+    signUp: 'S\'inscrire',
+    connectionError: 'Erreur de connexion. Veuillez vérifier votre connexion Internet.',
+    loginError: 'Échec de la connexion. Veuillez réessayer.',
+    signingIn: 'Connexion en cours...',
+    logoutSuccess: 'Déconnexion réussie'
   },
   zh: {
     appName: '农场新鲜盛宴',
@@ -239,7 +265,11 @@ const translations: Translations = {
     forgotPassword: '忘记密码？',
     signIn: '登录',
     dontHaveAccount: '没有账户？',
-    signUp: '注册'
+    signUp: '注册',
+    connectionError: '连接错误。请检查您的互联网连接。',
+    loginError: '登录失败。请重试。',
+    signingIn: '登录中...',
+    logoutSuccess: '注销成功'
   },
   ms: {
     appName: 'Pesta Segar Ladang',
@@ -310,7 +340,11 @@ const translations: Translations = {
     backToHome: 'Kembali ke Utama',
     pending: 'Tertunda',
     processing: 'Sedang Diproses',
-    delivered: 'Dihantar'
+    delivered: 'Dihantar',
+    connectionError: 'Ralat sambungan. Sila periksa sambungan internet anda.',
+    loginError: 'Log masuk gagal. Sila cuba lagi.',
+    signingIn: 'Log masuk...',
+    logoutSuccess: 'Log keluar berjaya'
   }
 };
 
@@ -346,9 +380,9 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return translations[language][key] || translations.en[key] || key;
   };
   
-  // Get currency symbol based on current language
+  // Get currency symbol based on current language - now fixed to RM for all languages
   const getCurrencySymbol = (): string => {
-    return currencySymbols[language] || '$';
+    return 'RM'; // Always return RM regardless of language
   };
 
   return (

@@ -36,10 +36,12 @@ const Login: React.FC = () => {
         toast.success(t('loginSuccess'));
         // Navigation will happen in the useEffect
       } else {
-        toast.error(error.message || t('invalidCredentials'));
+        console.error('Login error:', error);
+        toast.error(error?.message || t('invalidCredentials'));
       }
     } catch (error) {
-      toast.error(t('loginError'));
+      console.error('Login error:', error);
+      toast.error(t('connectionError') || 'Connection error. Please check your internet connection or try again later.');
     } finally {
       setIsLoading(false);
     }
