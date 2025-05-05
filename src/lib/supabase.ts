@@ -85,7 +85,7 @@ export async function createOrder(orderData: {
   items: Array<{ productId: string, quantity: number, price: number }>
 }) {
   // First create the order
-  const { data: orderData, error: orderError } = await supabase
+  const { data: createdOrder, error: orderError } = await supabase
     .from('orders')
     .insert({
       user_id: orderData.userId,
@@ -100,7 +100,7 @@ export async function createOrder(orderData: {
 
   // Then create order items
   const orderItems = orderData.items.map(item => ({
-    order_id: orderData.id,
+    order_id: createdOrder.id,
     product_id: item.productId,
     quantity: item.quantity,
     price: item.price,
@@ -112,7 +112,7 @@ export async function createOrder(orderData: {
 
   if (itemsError) return { data: null, error: itemsError };
 
-  return { data: orderData, error: null };
+  return { data: createdOrder, error: null };
 }
 
 // Database functions - Order History
