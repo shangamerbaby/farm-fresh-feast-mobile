@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Globe, Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
-import { AuthError, User } from '@supabase/supabase-js';
+import { AuthError, User as SupabaseUser } from '@supabase/supabase-js';
 
 const Login: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
