@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
@@ -10,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Globe, Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
+import { AuthError, User } from '@supabase/supabase-js';
 
 const Login: React.FC = () => {
   const { t, language, setLanguage, availableLanguages } = useLanguage();
@@ -43,51 +43,37 @@ const Login: React.FC = () => {
         }
 
         // Create admin test account
-        const { error: adminError } = await supabase.auth.admin.createUser({
+        const { error: adminError, data: adminAuthData } = await supabase.auth.admin.createUser({
           email: 'admin@example.com',
           password: 'admin123',
           email_confirm: true,
         });
 
-        if (!adminError) {
-          // Get the user ID from auth
-          const { data: adminUser } = await supabase.auth.admin.getUserById(
-            (await supabase.auth.admin.listUsers()).data.users.find(u => u.email === 'admin@example.com')?.id || ''
-          );
-
-          if (adminUser?.user) {
-            // Add to users table
-            await supabase.from('users').insert({
-              id: adminUser.user.id,
-              email: 'admin@example.com',
-              role: 'admin',
-            });
-            console.log('Admin account created');
-          }
+        if (!adminError && adminAuthData?.user) {
+          // Add to users table
+          await supabase.from('users').insert({
+            id: adminAuthData.user.id,
+            email: 'admin@example.com',
+            role: 'admin',
+          });
+          console.log('Admin account created');
         }
 
         // Create customer test account
-        const { error: customerError } = await supabase.auth.admin.createUser({
+        const { error: customerError, data: customerAuthData } = await supabase.auth.admin.createUser({
           email: 'customer@example.com',
           password: 'customer123',
           email_confirm: true,
         });
 
-        if (!customerError) {
-          // Get the user ID from auth
-          const { data: customerUser } = await supabase.auth.admin.getUserById(
-            (await supabase.auth.admin.listUsers()).data.users.find(u => u.email === 'customer@example.com')?.id || ''
-          );
-
-          if (customerUser?.user) {
-            // Add to users table
-            await supabase.from('users').insert({
-              id: customerUser.user.id,
-              email: 'customer@example.com',
-              role: 'customer',
-            });
-            console.log('Customer account created');
-          }
+        if (!customerError && customerAuthData?.user) {
+          // Add to users table
+          await supabase.from('users').insert({
+            id: customerAuthData.user.id,
+            email: 'customer@example.com',
+            role: 'customer',
+          });
+          console.log('Customer account created');
         }
       } catch (error) {
         console.error('Error creating test accounts:', error);
