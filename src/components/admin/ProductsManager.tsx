@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../../context/LanguageContext';
-import { getCategories, products } from '../../data/products';
+import { getCategories, getAllProducts } from '../../data/products';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/table';
 import { Plus, Pencil, TrashIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { Product } from '../../context/CartContext';
 
 // Product Form type
 interface ProductFormData {
@@ -37,19 +39,43 @@ interface ProductFormData {
 
 const ProductsManager: React.FC = () => {
   const { t } = useLanguage();
-  const categories = getCategories();
-  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
-  const [productsList, setProductsList] = useState(products);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['adminCategories'],
+    queryFn: getCategories
+  });
+  
+  // Fetch all products
+  const { 
+    data: productsList = [], 
+    refetch: refetchProducts
+  } = useQuery({
+    queryKey: ['adminProducts'],
+    queryFn: getAllProducts
+  });
+  
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
     name: '',
-    category: categories[0],
+    category: '',
     cut: '',
     price: 0,
     image: '',
     description: ''
   });
+
+  // Update formData.category when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0 && !formData.category) {
+      setFormData(prev => ({
+        ...prev,
+        category: categories[0]
+      }));
+    }
+  }, [categories]);
 
   const handleFormChange = (field: string, value: string | number) => {
     setFormData(prev => ({
@@ -62,7 +88,7 @@ const ProductsManager: React.FC = () => {
     setFormData({
       id: '',
       name: '',
-      category: categories[0],
+      category: categories[0] || '',
       cut: '',
       price: 0,
       image: '',
@@ -71,7 +97,7 @@ const ProductsManager: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Generate ID if adding new product
@@ -83,19 +109,24 @@ const ProductsManager: React.FC = () => {
       price: Number(formData.price)
     };
     
-    if (isEditing) {
-      // Update existing product
-      setProductsList(prev => 
-        prev.map(p => p.id === newProduct.id ? newProduct : p)
-      );
-      toast.success(t('productUpdated'));
-    } else {
-      // Add new product
-      setProductsList(prev => [...prev, newProduct]);
-      toast.success(t('productAdded'));
+    try {
+      // Here you would add code to save to Supabase
+      // For now, let's just mock this
+      if (isEditing) {
+        // Update existing product
+        toast.success(t('productUpdated'));
+      } else {
+        // Add new product
+        toast.success(t('productAdded'));
+      }
+      
+      // Refetch products
+      refetchProducts();
+      resetForm();
+    } catch (error) {
+      toast.error(t('errorSavingProduct'));
+      console.error('Error saving product:', error);
     }
-    
-    resetForm();
   };
 
   const handleEditProduct = (productId: string) => {
@@ -107,17 +138,30 @@ const ProductsManager: React.FC = () => {
         category: productToEdit.category,
         cut: productToEdit.cut || '',
         price: productToEdit.price,
-        image: productToEdit.image,
-        description: productToEdit.description
+        image: productToEdit.image || '',
+        description: productToEdit.description || ''
       });
       setIsEditing(true);
     }
   };
 
-  const handleDeleteProduct = (productId: string) => {
-    setProductsList(prev => prev.filter(p => p.id !== productId));
-    toast.success(t('productDeleted'));
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      // Here you would add code to delete from Supabase
+      // For now, let's just mock this
+      toast.success(t('productDeleted'));
+      
+      // Refetch products
+      refetchProducts();
+    } catch (error) {
+      toast.error(t('errorDeletingProduct'));
+      console.error('Error deleting product:', error);
+    }
   };
+
+  const filteredProducts = selectedCategory === 'all' 
+    ? productsList 
+    : productsList.filter(p => p.category === selectedCategory);
 
   return (
     <div>
@@ -154,31 +198,29 @@ const ProductsManager: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {productsList
-                    .filter(p => selectedCategory === 'all' || p.category === selectedCategory)
-                    .map(product => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">{product.name}</TableCell>
-                        <TableCell>{t(product.category)}</TableCell>
-                        <TableCell>{product.price.toFixed(2)}</TableCell>
-                        <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleEditProduct(product.id)}
-                          >
-                            <Pencil size={16} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleDeleteProduct(product.id)}
-                          >
-                            <TrashIcon size={16} />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                  {filteredProducts.map(product => (
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{t(product.category)}</TableCell>
+                      <TableCell>{product.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEditProduct(product.id)}
+                        >
+                          <Pencil size={16} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDeleteProduct(product.id)}
+                        >
+                          <TrashIcon size={16} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>

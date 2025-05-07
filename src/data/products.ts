@@ -2,8 +2,19 @@
 import { Product } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 
-// Get products from database
-export const products: Product[] = [];
+// Get all products
+export const getAllProducts = async (): Promise<Product[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*');
+  
+  if (error) {
+    console.error('Error fetching all products:', error);
+    return [];
+  }
+  
+  return data as Product[];
+};
 
 // Get products by category
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {

@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext';
-import { getFeaturedProducts, getBestSellingProducts, getCategories } from '../data/products';
+import { getCategories, getFeaturedProducts, getBestSellingProducts } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,9 +28,21 @@ const Index: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   
-  const categories = getCategories();
-  const featuredProducts = getFeaturedProducts(4);
-  const bestSellers = getBestSellingProducts(4);
+  // Fetch data with React Query
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories
+  });
+  
+  const { data: featuredProducts = [] } = useQuery({
+    queryKey: ['featuredProducts'],
+    queryFn: () => getFeaturedProducts(4)
+  });
+  
+  const { data: bestSellers = [] } = useQuery({
+    queryKey: ['bestSellers'],
+    queryFn: () => getBestSellingProducts(4)
+  });
 
   const handleCategoryClick = (category: string) => {
     navigate('/categories', { state: { selectedCategory: category } });

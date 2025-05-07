@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext';
-import { getCategories, getProductsByCategory, products } from '../data/products';
+import { getCategories, getProductsByCategory, getAllProducts } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,27 +12,38 @@ import { Search, ArrowLeft } from 'lucide-react';
 
 const Categories: React.FC = () => {
   const { t } = useLanguage();
-  const categories = getCategories();
   const location = useLocation();
   const navigate = useNavigate();
-  const preSelectedCategory = location.state?.selectedCategory || categories[0];
+  const preSelectedCategory = location.state?.selectedCategory;
   
-  const [selectedCategory, setSelectedCategory] = useState<string>(preSelectedCategory);
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories
+  });
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   
-  const filteredProducts = selectedCategory 
-    ? getProductsByCategory(selectedCategory).filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (p.cut && p.cut.toLowerCase().includes(searchQuery.toLowerCase())))
-    : products.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (p.cut && p.cut.toLowerCase().includes(searchQuery.toLowerCase())));
-
+  // Set initial category once categories are loaded
   useEffect(() => {
-    if (location.state?.selectedCategory) {
-      setSelectedCategory(location.state.selectedCategory);
+    if (categories.length > 0) {
+      setSelectedCategory(preSelectedCategory || categories[0]);
     }
-  }, [location.state]);
+  }, [preSelectedCategory, categories]);
+  
+  // Fetch products by selected category
+  const { data: categoryProducts = [] } = useQuery({
+    queryKey: ['products', selectedCategory],
+    queryFn: () => selectedCategory ? getProductsByCategory(selectedCategory) : getAllProducts(),
+    enabled: !!selectedCategory
+  });
+  
+  // Filter products by search query
+  const filteredProducts = categoryProducts.filter(p => 
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (p.cut && p.cut.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="container px-4 pt-4 pb-20">
@@ -55,35 +67,37 @@ const Categories: React.FC = () => {
       </div>
 
       {/* Category tabs */}
-      <Tabs defaultValue={selectedCategory} onValueChange={setSelectedCategory} className="mb-6">
-        <TabsList className="mb-4 w-full overflow-x-auto flex space-x-2 bg-transparent">
+      {categories.length > 0 && (
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-6">
+          <TabsList className="mb-4 w-full overflow-x-auto flex space-x-2 bg-transparent">
+            {categories.map(category => (
+              <TabsTrigger 
+                key={category} 
+                value={category} 
+                className="px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                {t(category)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          
           {categories.map(category => (
-            <TabsTrigger 
-              key={category} 
-              value={category} 
-              className="px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-white"
-            >
-              {t(category)}
-            </TabsTrigger>
+            <TabsContent key={category} value={category} className="mt-0">
+              {searchQuery && filteredProducts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No products found matching "{searchQuery}"
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  {filteredProducts.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
           ))}
-        </TabsList>
-        
-        {categories.map(category => (
-          <TabsContent key={category} value={category} className="mt-0">
-            {searchQuery && filteredProducts.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No products found matching "{searchQuery}"
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+        </Tabs>
+      )}
     </div>
   );
 };

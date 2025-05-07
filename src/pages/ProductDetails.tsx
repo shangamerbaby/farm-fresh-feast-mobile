@@ -1,13 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { getProductById, getProductsByCategory } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ArrowLeft, Plus, Minus } from 'lucide-react';
-import { useState } from 'react';
 
 const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,9 +17,26 @@ const ProductDetails: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const currencySymbol = getCurrencySymbol();
 
-  const product = getProductById(id || '');
+  // Fetch product details
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => getProductById(id || ''),
+    enabled: !!id
+  });
   
-  if (!product) {
+  // Fetch similar products
+  const { data: similarProducts = [] } = useQuery({
+    queryKey: ['similarProducts', product?.category],
+    queryFn: () => getProductsByCategory(product?.category || ''),
+    enabled: !!product?.category,
+    select: (data) => data.filter(p => p.id !== product?.id).slice(0, 4)
+  });
+  
+  if (isLoading) {
+    return <div className="container px-4 py-8 text-center">Loading...</div>;
+  }
+  
+  if (error || !product) {
     return (
       <div className="container px-4 py-8 text-center">
         <p className="text-lg">Product not found</p>
@@ -29,10 +46,6 @@ const ProductDetails: React.FC = () => {
       </div>
     );
   }
-
-  const similarProducts = getProductsByCategory(product.category)
-    .filter(p => p.id !== product.id)
-    .slice(0, 4);
 
   const handleAddToCart = () => {
     addItem(product, quantity);
